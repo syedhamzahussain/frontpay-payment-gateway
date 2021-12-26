@@ -22,6 +22,7 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 		public function __construct() {
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'wceshopspay_add_gateway' ), 10, 1 );
 			add_action( 'plugins_loaded', array( $this, 'includes' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ) );
 		}
 
 		/*
@@ -36,6 +37,12 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 
 		public function includes() {
 			require_once FPPG_PLUGIN_DIR . '/includes/class-fppg-wc.php';
+		}
+
+		public function admin_assets() {
+			if( isset( $_GET['section'] ) && 'frontpay' == $_GET['section'] ){
+				wp_enqueue_script( 'fppg-admin-script', FPPG_ASSETS_DIR_URL . '/js/admin.js', array( 'jquery' ), rand() );
+			}
 		}
 
 	}
