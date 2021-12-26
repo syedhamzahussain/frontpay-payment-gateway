@@ -77,6 +77,19 @@ if ( ! class_exists( 'Fppg_Wc' ) ) {
 		}
 
 		public function process_payment( $order_id ) {
+			$gateway_options = get_option( 'woocommerce_frontpay_settings' );
+			$token = fppg_get_token( $gateway_options['fp_merchant_id'] , $gateway_options['fp_merchant_secret'] );
+
+			if( $token ){
+				global $woocommerce;
+				$customer_order  = wc_get_order( $order_id );
+				echo fppg_create_order( $order_id , $token , $this->get_return_url( $customer_order ) );
+			}
+
+			return array(
+				'result'   => 'success',
+				'redirect' => $url,
+			);
 
 		}
 

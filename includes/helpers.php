@@ -44,3 +44,35 @@ function fppg_get_token( $fp_merchant_id , $fp_merchant_secret ){
 
     return $response->token;
 }
+
+function fppg_create_order( $order_id , $bearer_token, $return_url ){
+
+	global $woocommerce;
+	$customer_order  = wc_get_order( $order_id );
+
+	$data['amount'] = $customer_order->get_total();
+	$data['transaction_reference'] = $order_id;
+	$data['currency'] = get_woocommerce_currency();
+	$data['mode'] = "TEST";
+	$data['success_url'] = $return_url;
+	
+	
+	//failure_url
+
+	$url = "https://portal.frontpay.pk/api/create-order";
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization:Bearer ' . $bearer_token));
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // this should be set to true in production
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $responseData = curl_exec($ch);
+    if (curl_errno($ch)) {
+    	return curl_error($ch);
+    }
+
+    curl_close($ch);
+    $response = json_decode($responseData);
+    return $response->result;
+}
