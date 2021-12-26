@@ -2,9 +2,9 @@
 /*
  * Plugin Name: FrontPay Payment Gateway
  * Description: Provides you FrontPay Payment Gateway Integration with Woocommerce.
- * Author: Syed Hamza Hussain
- * Author URI: https://www.upwork.com/fl/syedhamzahussain
- * Version: 1.1.1.0
+ * Author: FrontPay
+ * Author URI: https://www.frontpay.pk
+ * Version: 1.1.1.1
  * Text Domain: fppg
 */
 

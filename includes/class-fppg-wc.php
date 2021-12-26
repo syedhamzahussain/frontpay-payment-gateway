@@ -73,23 +73,38 @@ if ( ! class_exists( 'Fppg_Wc' ) ) {
 					'title' => __( 'Merchant Secret', 'eshopspay' ),
 					'type'  => 'password',
 				),
+				'fp_mode'            => array(
+					'title'   => __( 'Mode', 'eshopspay' ),
+					'type'    => 'select',
+					'options' => array(
+						'TEST' => 'TEST',
+						'LIVE' => 'LIVE',
+					),
+					'css'     => 'max-width:20%;',
+					'default' => 'TEST',
+				),
 			);
 		}
 
 		public function process_payment( $order_id ) {
 			$gateway_options = get_option( 'woocommerce_frontpay_settings' );
-			$token = fppg_get_token( $gateway_options['fp_merchant_id'] , $gateway_options['fp_merchant_secret'] );
+			$token           = fppg_get_token( $gateway_options['fp_merchant_id'], $gateway_options['fp_merchant_secret'] );
 
-			if( $token ){
+			if ( $token ) {
 				global $woocommerce;
-				$customer_order  = wc_get_order( $order_id );
-				echo fppg_create_order( $order_id , $token , $this->get_return_url( $customer_order ) );
+				$customer_order = wc_get_order( $order_id );
+				$url            = fppg_create_order( $order_id, $token, $this->get_return_url( $customer_order ), $gateway_options['fp_mode'] );
 			}
-
-			return array(
-				'result'   => 'success',
-				'redirect' => $url,
-			);
+			if ( $url ) {
+				WC()->cart->empty_cart();
+				return array(
+					'result'   => 'success',
+					'redirect' => $url->result->payment_url,
+				);
+			} else {
+				wc_add_notice( 'Something Went Wrong.Please Try later.', 'error' );
+				return;
+			}
 
 		}
 

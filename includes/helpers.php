@@ -21,58 +21,56 @@ function fppg_is_woo_active() {
 	return false;
 }
 
-function fppg_get_token( $fp_merchant_id , $fp_merchant_secret ){
-	$data['fp_merchant_id'] = $fp_merchant_id;
+function fppg_get_token( $fp_merchant_id, $fp_merchant_secret ) {
+	$data['fp_merchant_id']     = $fp_merchant_id;
 	$data['fp_merchant_secret'] = $fp_merchant_secret;
-	$url = "https://portal.frontpay.pk/api/create-token";
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-    // curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        //     'Authorization:Bearer ' . $bearer_token));
-	curl_setopt($ch, CURLOPT_POST, 1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // this should be set to true in production
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $responseData = curl_exec($ch);
-    if (curl_errno($ch)) {
-    	return curl_error($ch);
-    }
+	$url                        = 'https://portal.frontpay.pk/api/create-token';
+	$ch                         = curl_init();
+	curl_setopt( $ch, CURLOPT_URL, $url );
+	curl_setopt( $ch, CURLOPT_POST, 1 );
+	curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
+	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true ); // this should be set to true in production
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+	$responseData = curl_exec( $ch );
+	if ( curl_errno( $ch ) ) {
+		return curl_error( $ch );
+	}
 
-    curl_close($ch);
+	curl_close( $ch );
 
-    $response = json_decode($responseData);
+	$response = json_decode( $responseData );
 
-    return $response->token;
+	return $response->token;
 }
 
-function fppg_create_order( $order_id , $bearer_token, $return_url ){
+function fppg_create_order( $order_id, $bearer_token, $return_url, $mode ) {
 
 	global $woocommerce;
-	$customer_order  = wc_get_order( $order_id );
+	$customer_order = wc_get_order( $order_id );
 
-	$data['amount'] = $customer_order->get_total();
+	$data['amount']                = $customer_order->get_total();
 	$data['transaction_reference'] = $order_id;
-	$data['currency'] = get_woocommerce_currency();
-	$data['mode'] = "TEST";
-	$data['success_url'] = $return_url;
-	
-	
-	//failure_url
+	$data['currency']              = get_woocommerce_currency();
+	$data['mode']                  = $mode;
+	$data['success_url']           = $return_url;
+	$data['failure_url']           = $customer_order->get_cancel_order_url();
 
-	$url = "https://portal.frontpay.pk/api/create-order";
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization:Bearer ' . $bearer_token));
-	curl_setopt($ch, CURLOPT_POST, 1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // this should be set to true in production
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $responseData = curl_exec($ch);
-    if (curl_errno($ch)) {
-    	return curl_error($ch);
-    }
+	// failure_url
 
-    curl_close($ch);
-    $response = json_decode($responseData);
-    return $response->result;
+	$url = 'https://portal.frontpay.pk/api/create-order';
+	$ch  = curl_init();
+	curl_setopt( $ch, CURLOPT_URL, $url );
+	curl_setopt( $ch, CURLOPT_HTTPHEADER, array( 'Authorization:Bearer ' . $bearer_token ) );
+	curl_setopt( $ch, CURLOPT_POST, 1 );
+	curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
+	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true ); // this should be set to true in production
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+	$responseData = curl_exec( $ch );
+	if ( curl_errno( $ch ) ) {
+		return curl_error( $ch );
+	}
+
+	curl_close( $ch );
+	$response = json_decode( $responseData );
+	return $response;
 }
