@@ -4,7 +4,7 @@
  * Description: Provides you FrontPay Payment Gateway Integration with Woocommerce.
  * Author: FrontPay
  * Author URI: https://www.frontpay.pk
- * Version: 1.1.1.1
+ * Version: 1.1.1.2
  * Text Domain: fppg
 */
 

@@ -25,6 +25,28 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ) );
 			add_action( 'woocommerce_thankyou', array( $this, 'mark_payment_complete' ), 10, 1 );
 			add_filter( 'woocommerce_available_payment_gateways', array( $this, 'frontpay_unset' ) );
+			add_action('admin_init',array( $this, 'admin_init' ) );
+		}
+
+		public function admin_init(){
+
+			// set fixed title and desc
+			$fp_settings = get_option('woocommerce_frontpay_settings');
+			$fp_settings['title'] = 'testing title';
+			$fp_settings['description'] = 'testing desc';
+
+			if( isset( $_GET['section'] ) && 'frontpay' == $_GET['section'] && !empty( $fp_settings['fp_merchant_id'] ) && !empty( $fp_settings['fp_merchant_secret'] ) ){
+				$merchant_found = fppg_get_token( $fp_settings['fp_merchant_id'], $fp_settings['fp_merchant_secret'] );
+
+				if(1 != $merchant_found->status ){
+					add_action( 'admin_notices', 'fppg_is_cred_valid' );
+					unset($fp_settings['fp_merchant_id']);
+					unset($fp_settings['fp_merchant_secret']);
+				}
+			}
+
+			update_option('woocommerce_frontpay_settings',$fp_settings);
+
 		}
 
 		public function frontpay_unset( $available_gateways ) {
@@ -47,6 +69,7 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 					$note = 'Successfully Paid using frontpay. ';
 					$order->add_order_note( $note );
 					$order->payment_complete();
+					WC()->cart->empty_cart();
 				}
 			}
 		}

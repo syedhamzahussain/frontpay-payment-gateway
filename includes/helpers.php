@@ -40,20 +40,21 @@ function fppg_get_token( $fp_merchant_id, $fp_merchant_secret ) {
 
 	$response = json_decode( $responseData );
 
-	return $response->token;
+	return $response;
 }
 
 function fppg_create_order( $order_id, $bearer_token, $return_url, $mode ) {
 
 	global $woocommerce;
 	$customer_order = wc_get_order( $order_id );
+	$gateway_options = get_option( 'woocommerce_frontpay_settings' );
 
 	$data['amount']                = $customer_order->get_total();
 	$data['transaction_reference'] = $order_id;
 	$data['currency']              = get_woocommerce_currency();
 	$data['mode']                  = $mode;
 	$data['success_url']           = $return_url;
-	$data['failure_url']           = $customer_order->get_cancel_order_url();
+	$data['failure_url']           = $gateway_options['fp_cancel_url'] ? $gateway_options['fp_cancel_url'] : $customer_order->get_cancel_order_url();
 
 	// failure_url
 
@@ -73,4 +74,12 @@ function fppg_create_order( $order_id, $bearer_token, $return_url, $mode ) {
 	curl_close( $ch );
 	$response = json_decode( $responseData );
 	return $response;
+}
+
+function fppg_is_cred_valid() {
+    ?>
+    <div class="notice notice-error">
+        <p><?php _e( 'Your Entered FrontPay Merchant id Or Merchant Secret is not Valid !', 'fppg' ); ?></p>
+    </div>
+    <?php
 }

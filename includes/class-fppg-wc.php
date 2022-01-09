@@ -53,18 +53,10 @@ if ( ! class_exists( 'Fppg_Wc' ) ) {
 					'type'    => 'checkbox',
 					'default' => 'no',
 				),
-				'title'              => array(
-					'title'    => __( 'Title', 'fppg' ),
+				'fp_cancel_url'              => array(
+					'title'    => __( 'Cancel Url', 'fppg' ),
 					'type'     => 'text',
-					'desc_tip' => __( 'Payment title of checkout process.', 'fppg' ),
-					'default'  => __( 'Credit card', 'fppg' ),
-				),
-				'description'        => array(
-					'title'    => __( 'Description', 'fppg' ),
-					'type'     => 'textarea',
-					'desc_tip' => __( 'Payment description of checkout process.', 'fppg' ),
-					'default'  => __( 'Successfully payment through credit card.', 'fppg' ),
-					'css'      => 'max-width:450px;',
+					'desc_tip' => __( 'Custom Cancel Page Url.', 'fppg' ),
 				),
 				'fp_merchant_id'     => array(
 					'title' => __( 'Merchant ID', 'eshopspay' ),
@@ -91,13 +83,12 @@ if ( ! class_exists( 'Fppg_Wc' ) ) {
 			$gateway_options = get_option( 'woocommerce_frontpay_settings' );
 			$token           = fppg_get_token( $gateway_options['fp_merchant_id'], $gateway_options['fp_merchant_secret'] );
 
-			if ( $token ) {
+			if ( $token->token ) {
 				global $woocommerce;
 				$customer_order = wc_get_order( $order_id );
-				$url            = fppg_create_order( $order_id, $token, $this->get_return_url( $customer_order ), $gateway_options['fp_mode'] );
+				$url            = fppg_create_order( $order_id, $token->token, $this->get_return_url( $customer_order ), $gateway_options['fp_mode'] );
 			}
 			if ( $url ) {
-				WC()->cart->empty_cart();
 				return array(
 					'result'   => 'success',
 					'redirect' => $url->result->payment_url,
