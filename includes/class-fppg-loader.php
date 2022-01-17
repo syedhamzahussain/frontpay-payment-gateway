@@ -25,7 +25,7 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ) );
 			add_action( 'woocommerce_thankyou', array( $this, 'mark_payment_complete' ), 10, 1 );
 			add_filter( 'woocommerce_available_payment_gateways', array( $this, 'frontpay_unset' ) );
-			add_action('admin_init',array( $this, 'admin_init' ) );
+			add_action('admin_init',array( $this, 'admin_init' ),99 );
 		}
 
 		public function admin_init(){
@@ -39,9 +39,14 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 				$merchant_found = fppg_get_token( $fp_settings['fp_merchant_id'], $fp_settings['fp_merchant_secret'] );
 
 				if(1 != $merchant_found->status ){
-					add_action( 'admin_notices', 'fppg_is_cred_valid' );
+					add_action( 'admin_notices', 'fppg_is_not_cred_valid' );
 					unset($fp_settings['fp_merchant_id']);
 					unset($fp_settings['fp_merchant_secret']);
+				}
+				else{
+					if( isset( $_POST['woocommerce_frontpay_fp_merchant_id'] ) && isset( $_POST['woocommerce_frontpay_fp_merchant_secret'] ) ){
+						add_action( 'admin_notices', 'fppg_is_cred_valid' );
+					}
 				}
 			}
 
@@ -94,6 +99,14 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 			if ( isset( $_GET['section'] ) && 'frontpay' == $_GET['section'] ) {
 				wp_enqueue_script( 'fppg-admin-script', FPPG_ASSETS_DIR_URL . '/js/admin.js', array( 'jquery' ), rand() );
 			}
+
+			wp_localize_script(
+				'fppg-admin-script',
+				'fppg_object',
+				array(
+					'fppg_logo' => FPPG_ASSETS_DIR_URL . '/images/logo.png',
+				)
+			);
 		}
 
 	}

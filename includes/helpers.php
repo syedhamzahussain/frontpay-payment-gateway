@@ -76,10 +76,18 @@ function fppg_create_order( $order_id, $bearer_token, $return_url, $mode ) {
 	return $response;
 }
 
-function fppg_is_cred_valid() {
+function fppg_is_not_cred_valid() {
     ?>
     <div class="notice notice-error">
         <p><?php _e( 'Your Entered FrontPay Merchant id Or Merchant Secret is not Valid !', 'fppg' ); ?></p>
+    </div>
+    <?php
+}
+
+function fppg_is_cred_valid() {
+    ?>
+    <div class="notice notice-success">
+        <p><?php _e( 'Your Merchant ID and Secret are added successfully !', 'fppg' ); ?></p>
     </div>
     <?php
 }
