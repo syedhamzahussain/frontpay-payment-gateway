@@ -30,7 +30,7 @@ if ( ! class_exists( 'Fppg_Wc' ) ) {
 			$this->method_description = __( 'Payment Via FrontPay', 'fppg' );
 			$this->title              = __( 'FrontPay', 'fppg' );
 			$this->has_fields         = true;
-			$this->icon               = FPPG_ASSETS_DIR_URL . '/images/logo.png';
+			$this->icon               = FPPG_ASSETS_DIR_URL . '/images/logo-checkout.png';
 			$this->init_form_fields();
 			$this->init_settings();
 			$this->ipn_url = add_query_arg( 'wc-api', 'Fppg_Wc', home_url( '/' ) );

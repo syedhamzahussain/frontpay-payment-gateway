@@ -23,6 +23,7 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_frontpay_gateway' ), 10, 1 );
 			add_action( 'plugins_loaded', array( $this, 'includes' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'front_assets' ) );
 			add_action( 'woocommerce_thankyou', array( $this, 'mark_payment_complete' ), 10, 1 );
 			add_filter( 'woocommerce_available_payment_gateways', array( $this, 'frontpay_unset' ) );
 			add_action('admin_init',array( $this, 'admin_init' ),99 );
@@ -93,6 +94,10 @@ if ( ! class_exists( 'Fppg_Loader' ) ) {
 
 		public function includes() {
 			require_once FPPG_PLUGIN_DIR . '/includes/class-fppg-wc.php';
+		}
+
+		public function front_assets() {
+			wp_enqueue_style( 'fppg-front-style', FPPG_ASSETS_DIR_URL . '/css/style.css' );
 		}
 
 		public function admin_assets() {

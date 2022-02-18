@@ -1,0 +1,10 @@
+.payment_method_frontpay img{
+	width: 70%;
+	max-height: 70%!important;
+	float: left!important;
+}
+
+.payment_method_frontpay p{
+	float: left!important;
+    width: 100%!important;
+}
